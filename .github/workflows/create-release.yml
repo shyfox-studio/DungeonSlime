@@ -1,0 +1,94 @@
+name: "Create Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      should-created:
+        description: "Should this release be created?"
+        required: true
+        type: choice
+        options:
+          - Yes
+          - No
+        default: No
+
+jobs:
+  build-windows:
+    name: "Windows Build"
+    runs-on: "windows-latest"
+    steps:
+      - name: "Clone Repository"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: "Setup Dotnet"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: "Restore Tools"
+        run: dotnet tool restore --tool-manifest source/DungeonSlime/.config/dotnet-tools.json
+
+      - name: "Monopack"
+        run: cd source/DungeonSlime/ && dotnet monopack
+
+      - name: "Upload Artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "windows-build"
+          path: "./source/DungeonSlime/bin/MonoPacked/DungeonSlime-win-x64.zip"
+
+  build-linux:
+    name: "Linux Build"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "Clone Repository"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: "Setup Dotnet"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: "Restore Tools"
+        run: dotnet tool restore --tool-manifest source/DungeonSlime/.config/dotnet-tools.json
+
+      - name: "Monopack"
+        run: cd source/DungeonSlime/ && dotnet monopack
+
+      - name: "Upload Artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "linux-build"
+          path: "./source/DungeonSlime/bin/MonoPacked/DungeonSlime-linux-x64.tar.gz"
+
+  build-mac:
+    name: "macOS Build"
+    runs-on: "macos-latest"
+    steps:
+      - name: "Clone Repository"
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: "Setup Dotnet"
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: "Restore Tools"
+        run: dotnet tool restore --tool-manifest source/DungeonSlime/.config/dotnet-tools.json
+
+      - name: "Monopack"
+        run: cd source/DungeonSlime/ && dotnet monopack
+
+      - name: "Upload Artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "mac-build"
+          path: "./source/DungeonSlime/bin/MonoPacked/DungeonSlime-universal.tar.gz"
+
+
